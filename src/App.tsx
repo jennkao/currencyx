@@ -32,6 +32,8 @@ function CurrencyExchangeRates(props: { rates: ExchangeRate[] }) {
 }
 
 function App() {
+  const [amount, setAmount] = useState<number>(1);
+  const [selectedRate, setSelectedRate] = useState<ExchangeRate | null>(null);
   const [rateResults, setRateResults] = useState<CurrencyExchangeResult | null>(
     null
   );
@@ -39,13 +41,64 @@ function App() {
     async function fetchData() {
       const res = await getCzkCurrencyExchangeRates();
       setRateResults(res);
+      setSelectedRate(res.rates[0]);
     }
     fetchData();
   }, []);
 
+  const onConversionAmountInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = Number(e.target.value);
+    setAmount(value);
+  };
+
+  const onCurrencySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (!rateResults) {
+      return;
+    }
+
+    const selectedCurrency = e.target.value;
+    const selectedRate = rateResults.rates.filter(
+      (r) => selectedCurrency === r.currencyCode
+    );
+    setSelectedRate(selectedRate[0]);
+  };
+
   return (
     <div className="App">
       <h1>Currency Converter</h1>
+      <div>
+        <div>
+          <input
+            type="number"
+            id="conversion_input"
+            name="conversion_input"
+            value={amount}
+            onChange={onConversionAmountInputChange}
+          />
+          <span>CZK</span>
+          {rateResults && (
+            <span>
+              <span> to currency </span>
+              <select
+                id="conversion_currency"
+                onChange={onCurrencySelect}
+                value={selectedRate?.currencyCode}
+              >
+                {rateResults.rates.map((r) => {
+                  return (
+                    <option value={r.currencyCode}>
+                      {capitalize(r.currency)} ({r.currencyCode})
+                    </option>
+                  );
+                })}
+              </select>
+            </span>
+          )}
+        </div>
+      </div>
+      <br />
       <div>1 Czech Koruna (CZK) converts to:</div>
       {rateResults && <CurrencyExchangeRates rates={rateResults.rates} />}
     </div>
