@@ -31,12 +31,21 @@ function CurrencyExchangeRates(props: { rates: ExchangeRate[] }) {
   );
 }
 
+interface DisplayedExchangeRate {
+  amount: number;
+  selectedRate: ExchangeRate;
+  convertedAmount: number;
+}
+
 function App() {
   const [amount, setAmount] = useState<number>(1);
   const [selectedRate, setSelectedRate] = useState<ExchangeRate | null>(null);
   const [rateResults, setRateResults] = useState<CurrencyExchangeResult | null>(
     null
   );
+  const [displayedRate, setDisplayedRate] =
+    useState<DisplayedExchangeRate | null>(null);
+
   useEffect(() => {
     async function fetchData() {
       const res = await getCzkCurrencyExchangeRates();
@@ -63,6 +72,18 @@ function App() {
       (r) => selectedCurrency === r.currencyCode
     );
     setSelectedRate(selectedRate[0]);
+  };
+
+  const onConvertClick = () => {
+    if (!selectedRate) {
+      return;
+    }
+
+    setDisplayedRate({
+      amount,
+      selectedRate,
+      convertedAmount: amount * selectedRate.rate,
+    });
   };
 
   return (
@@ -97,7 +118,15 @@ function App() {
             </span>
           )}
         </div>
+        <button onClick={onConvertClick}>Convert</button>
       </div>
+      {displayedRate && (
+        <div>
+          {displayedRate.amount} CZK to {displayedRate.convertedAmount}{" "}
+          {capitalize(displayedRate.selectedRate.currency)} (
+          {displayedRate.selectedRate.currencyCode})
+        </div>
+      )}
       <br />
       <div>1 Czech Koruna (CZK) converts to:</div>
       {rateResults && <CurrencyExchangeRates rates={rateResults.rates} />}
