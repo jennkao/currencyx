@@ -39,5 +39,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "proxy": {
+    "/daily.txt": {
+      "target": "http://www.cnb.cz/en/financial-markets/foreign-exchange-market/central-bank-exchange-rate-fixing/central-bank-exchange-rate-fixing",
+      "changeOrigin": true
+    }
   }
 }
