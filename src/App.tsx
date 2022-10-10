@@ -5,32 +5,8 @@ import {
   CurrencyExchangeResult,
   ExchangeRate,
 } from "./currency";
+import CurrencyExchangeRates from "./Components/CurrencyExchangeRates";
 import "./App.css";
-
-function CurrencyExchangeRate(props: { exchangeRate: ExchangeRate }) {
-  const { exchangeRate } = props;
-  const currency = pluralize(capitalize(exchangeRate.currency));
-  return (
-    <div className="CurrencyExchangeRate">
-      {exchangeRate.rate} {currency} ({exchangeRate.currencyCode} -{" "}
-      {exchangeRate.country})
-    </div>
-  );
-}
-
-function CurrencyExchangeRates(props: { rates: ExchangeRate[] }) {
-  const { rates } = props;
-  return (
-    <div className="CurrencyExchangeRates">
-      <div className="CurrencyExchangeRates__text">
-        1 Czech Koruna (CZK) converts to:
-      </div>
-      {rates.map((r) => (
-        <CurrencyExchangeRate key={r.currencyCode} exchangeRate={r} />
-      ))}
-    </div>
-  );
-}
 
 interface DisplayedExchangeRate {
   amount: number;
@@ -76,7 +52,6 @@ function App() {
     if (!rateResults) {
       return;
     }
-
     const selectedCurrency = e.target.value;
     const selectedRate = rateResults.rates.filter(
       (r) => selectedCurrency === r.currencyCode
@@ -88,7 +63,6 @@ function App() {
     if (!selectedRate) {
       return;
     }
-
     const converted = amount * selectedRate.rate;
     setDisplayedRate({
       amount,
