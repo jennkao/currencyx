@@ -1,4 +1,50 @@
+.Layout {
+  display: flex;
+  justify-content: center;
+}
+
 .App {
   text-align: center;
+}
+
+.CurrencyExchangeRates {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.CurrencyExchangeRates__text {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.CurrencyExchangeRate {
+  text-align: center;
+  padding: 5px;
+}
+
+.DisplayedRate {
+  margin-top: 50px;
+  font-size: 30px;
+}
+
+#amountInput {
+  width: 60px;
+  text-align: center;
+  margin-right: 10px;
+}
+
+#currencyDropdown {
+  text-align: center;
+  margin-left: 10px;
+}
+
+.ConvertBtn {
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.ConversionInputs {
+  margin-top: 50px;
 }
 

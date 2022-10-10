@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { capitalize } from "./utils";
+import { capitalize, pluralize } from "./utils";
 import {
   getCzkCurrencyExchangeRates,
   CurrencyExchangeResult,
@@ -9,13 +9,11 @@ import "./App.css";
 
 function CurrencyExchangeRate(props: { exchangeRate: ExchangeRate }) {
   const { exchangeRate } = props;
-  const currency = capitalize(exchangeRate.currency);
+  const currency = pluralize(capitalize(exchangeRate.currency));
   return (
-    <div>
-      <div>
-        {exchangeRate.rate} {currency} ({exchangeRate.currencyCode})
-      </div>
-      <div>{exchangeRate.country}</div>
+    <div className="CurrencyExchangeRate">
+      {exchangeRate.rate} {currency} ({exchangeRate.currencyCode} -{" "}
+      {exchangeRate.country})
     </div>
   );
 }
@@ -23,7 +21,10 @@ function CurrencyExchangeRate(props: { exchangeRate: ExchangeRate }) {
 function CurrencyExchangeRates(props: { rates: ExchangeRate[] }) {
   const { rates } = props;
   return (
-    <div>
+    <div className="CurrencyExchangeRates">
+      <div className="CurrencyExchangeRates__text">
+        1 Czech Koruna (CZK) converts to:
+      </div>
       {rates.map((r) => (
         <CurrencyExchangeRate key={r.currencyCode} exchangeRate={r} />
       ))}
@@ -33,8 +34,17 @@ function CurrencyExchangeRates(props: { rates: ExchangeRate[] }) {
 
 interface DisplayedExchangeRate {
   amount: number;
-  selectedRate: ExchangeRate;
+  rate: ExchangeRate;
   convertedAmount: number;
+}
+
+function DisplayedCurrencyExchangeRate(props: {
+  displayedRate: DisplayedExchangeRate;
+}) {
+  const { displayedRate } = props;
+  const currency = pluralize(capitalize(displayedRate.rate.currency));
+  const text = `${displayedRate.amount} CZK to ${displayedRate.convertedAmount} ${currency} (${displayedRate.rate.currencyCode} - ${displayedRate.rate.country})`;
+  return <div className="DisplayedRate">{text}</div>;
 }
 
 function App() {
@@ -79,57 +89,52 @@ function App() {
       return;
     }
 
+    const converted = amount * selectedRate.rate;
     setDisplayedRate({
       amount,
-      selectedRate,
-      convertedAmount: amount * selectedRate.rate,
+      rate: selectedRate,
+      convertedAmount: parseFloat(converted.toFixed(3)),
     });
   };
 
   return (
-    <div className="App">
-      <h1>Currency Converter</h1>
-      <div>
-        <div>
+    <div className="Layout">
+      <div className="App">
+        <h1>Currency Converter</h1>
+        <div className="ConversionInputs">
           <input
+            id="amountInput"
             type="number"
-            id="conversion_input"
-            name="conversion_input"
             value={amount}
             onChange={onConversionAmountInputChange}
           />
-          <span>CZK</span>
+          <span>CZK to currency</span>
           {rateResults && (
-            <span>
-              <span> to currency </span>
-              <select
-                id="conversion_currency"
-                onChange={onCurrencySelect}
-                value={selectedRate?.currencyCode}
-              >
-                {rateResults.rates.map((r) => {
-                  return (
-                    <option value={r.currencyCode}>
-                      {capitalize(r.currency)} ({r.currencyCode})
-                    </option>
-                  );
-                })}
-              </select>
-            </span>
+            <select
+              id="currencyDropdown"
+              onChange={onCurrencySelect}
+              value={selectedRate?.currencyCode}
+            >
+              {rateResults.rates.map((r) => {
+                return (
+                  <option key={r.currencyCode} value={r.currencyCode}>
+                    {capitalize(r.currency)} ({r.currencyCode} - {r.country})
+                  </option>
+                );
+              })}
+            </select>
           )}
+          <button className="ConvertBtn" onClick={onConvertClick}>
+            Convert
+          </button>
         </div>
-        <button onClick={onConvertClick}>Convert</button>
+
+        {displayedRate && (
+          <DisplayedCurrencyExchangeRate displayedRate={displayedRate} />
+        )}
+
+        {rateResults && <CurrencyExchangeRates rates={rateResults.rates} />}
       </div>
-      {displayedRate && (
-        <div>
-          {displayedRate.amount} CZK to {displayedRate.convertedAmount}{" "}
-          {capitalize(displayedRate.selectedRate.currency)} (
-          {displayedRate.selectedRate.currencyCode})
-        </div>
-      )}
-      <br />
-      <div>1 Czech Koruna (CZK) converts to:</div>
-      {rateResults && <CurrencyExchangeRates rates={rateResults.rates} />}
     </div>
   );
 }
